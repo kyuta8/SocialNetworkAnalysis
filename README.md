@@ -59,3 +59,4 @@ between:：媒介中心性のプロットを行うか（default：False）
 eigen：固有ベクトル中心性のプロットを行うか（default：False）＊これはいらなさそう  
 sequence：時系列分析（default：False）
 cluster：クラスター係数の出力（default：False）
+save：png出力（default：False）
