@@ -168,12 +168,14 @@ def pajek_to_net(files: list, target=[], figure_x=30, figure_y=30, print_graph=T
 
             if between:
                 path = f'./between/{_sequence}/{target[0]}'
+                os.makedirs(path, exist_ok=True)
                 print('Time location：{} → {}'.format(files[i], files[i+1]))
                 between_centrality(Graph).to_csv(os.path.join(path, 'between_' + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i]))
                                                                 + '+' + re.sub('.paj', '.csv', os.path.basename(files[i+1]))))
 
             if eigen:
                 path = f'./eigen/{_sequence}/{target[0]}'
+                os.makedirs(path, exist_ok=True)
                 print('Time location：{} → {}'.format(files[i], files[i+1]))
                 eigen_centrality(Graph).to_csv(os.path.join(path, 'eigen_' + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i]))
                                                                 + '+' + re.sub('.paj', '.csv', os.path.basename(files[i+1]))))
@@ -189,7 +191,7 @@ def print_clustering_value(Graph: object):
 
 
 if __name__ == '__main__':
-    files = glob.glob('AnalysisData/**/*.paj')
+    files = sorted(glob.glob('AnalysisData/**/*.paj'))
 
     pajek_to_net(files, target=['dev'], figure_x=50, figure_y=50, anotation=True, degree=True, close=True, between=True, print_graph=False)
     pajek_to_net(files, target=['bug'], figure_x=50, figure_y=50, anotation=True, degree=True, close=True, between=True, print_graph=False)
