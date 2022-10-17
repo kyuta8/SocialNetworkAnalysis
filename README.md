@@ -10,6 +10,8 @@ pandas == 1.4.3
 ``` pip install -r requirement.txt ```
 
 ### 実行方法（追記：2022/10/17）
+1. rootディレクトリにpajファイルが含まれるフォルダを置く
+2. 以下のコマンドを実行する
 ``` python main.py ```
 
 ### 開発者とバグIDのネットワークを出力
