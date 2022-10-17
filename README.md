@@ -2,10 +2,10 @@
 ## .pajファイルの読込みとグラフの出力と</br>ネットワークの時系列分析を目的としたノートブック
 
 ### 必要なパッケージ（追記：2022/10/17）
-networkx == 2.8.7
-matplotlib == 3.5.2
-seaborn == 0.11.2
-pandas == 1.4.3
+networkx == 2.8.7  
+matplotlib == 3.5.2  
+seaborn == 0.11.2  
+pandas == 1.4.3  
 
 ``` pip install -r requirement.txt ```
 
