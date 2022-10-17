@@ -1,0 +1,5 @@
+###### Requirements without Version Specifiers (17/10/2022) ######`
+networkx # current version == 2.8.7
+matplotlib # current version == 3.5.2
+seaborn # current version == 0.11.2
+pandas # current version == 1.4.3
