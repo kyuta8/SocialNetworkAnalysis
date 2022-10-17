@@ -191,7 +191,7 @@ def print_clustering_value(Graph: object):
 
 
 if __name__ == '__main__':
-    files = sorted(glob.glob('AnalysisData/**/*.paj'))
+    files = sorted(glob.glob('./**/*.paj'))
 
     pajek_to_net(files, target=['dev'], figure_x=50, figure_y=50, anotation=True, degree=True, close=True, between=True, print_graph=False)
     pajek_to_net(files, target=['bug'], figure_x=50, figure_y=50, anotation=True, degree=True, close=True, between=True, print_graph=False)
