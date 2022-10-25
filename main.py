@@ -52,7 +52,7 @@ def color_add_node(ori: list, pre: list, post: list):
 def pajek_to_net(files: list, target=[], figure_x=30, figure_y=30, print_graph=True,
                  anotation=False, node_alpha=0.6, edge_alpha=0.8, label_alpha=0.8,
                  font_size=10, degree=False, close=False, between=False,
-                 eigen=False, sequence=False, cluster=False, save=False):
+                 eigen=False, sequence=False, cluster=False, save=True):
 
     """
         files：.pajの拡張子のファイルリスト（読み込みたいファイルが1つでもリスト形式で）
@@ -122,30 +122,53 @@ def pajek_to_net(files: list, target=[], figure_x=30, figure_y=30, print_graph=T
                 plt.close()
 
     if target:
-        for i in range(len(files)-1):
-            Graph = nx.Graph()
+        if sequence:
+            count = len(files) - 1
+        else:
+            count = len(files)
 
+        for i in range(count):
+            if sequence:
+                print('Time location：{} → {}'.format(files[i], files[i+1]))
+            else:
+                print('Time location：{}'.format(files[i]))
+
+            Graph = nx.Graph()
             Graph.add_edges_from(edges[i])
-            Graph.add_edges_from(edges[i+1])
+            if sequence:
+                Graph.add_edges_from(edges[i+1])
+
+            Graph.remove_edges_from(nx.selfloop_edges(Graph))
 
             if print_graph:
                 plt.figure(figsize=(figure_x, figure_y))
-                plt.title('Time location: ' + re.sub('.paj', '', os.path.basename(files[i]))
-                            + ' + ' + re.sub('.paj', '', os.path.basename(files[i+1])),
-                            fontsize=50)
+                if sequence:
+                    plt.title('Time location: ' + re.sub('.paj', '', os.path.basename(files[i]))
+                                + ' + ' + re.sub('.paj', '', os.path.basename(files[i+1])),
+                                fontsize=50)
+                else:
+                    plt.title('Time location: ' + re.sub('.paj', '', os.path.basename(files[i])), fontsize=50)
+
                 pos = nx.kamada_kawai_layout(Graph)
 
-                nx.draw_networkx_nodes(Graph, pos, node_color=color_add_node(list(Graph.nodes), nodes[i], nodes[i+1]), alpha=node_alpha)
-                nx.draw_networkx_edges(Graph, pos, edge_color='gray', alpha=edge_alpha)
+                if sequence:
+                    nx.draw_networkx_nodes(Graph, pos, node_color=color_add_node(list(Graph.nodes), nodes[i], nodes[i+1]), alpha=node_alpha)
+                    nx.draw_networkx_edges(Graph, pos, edge_color='gray', alpha=edge_alpha)
+                else:
+                    nx.draw_networkx_nodes(Graph, pos, node_color='yellow', alpha=node_alpha)
+                    nx.draw_networkx_edges(Graph, pos, edge_color='gray', alpha=edge_alpha)
 
                 if anotation:
                     nx.draw_networkx_labels(Graph, pos, font_size=font_size, alpha=label_alpha)
 
                 if save:
-                    path = f'./1-mode/{target[0]}/{_sequence}'
+                    path = f'./1-mode/{target[0]}/{_sequence}/'
                     os.makedirs(path, exist_ok=True)
-                    plt.savefig(path + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i])) 
-                                + '+' + re.sub('.paj', '.png', os.path.basename(files[i+1])))
+                    if sequence:
+                        plt.savefig(path + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i])) 
+                                    + '+' + re.sub('.paj', '.png', os.path.basename(files[i+1])))
+                    else:
+                        plt.savefig(path + target[0] + '_' + re.sub('.paj', '.png', os.path.basename(files[i])))
 
                 else:
                     plt.show()
@@ -153,34 +176,51 @@ def pajek_to_net(files: list, target=[], figure_x=30, figure_y=30, print_graph=T
                 plt.close()
                 
             if degree:
-                path = f'./degree/{_sequence}/{target[0]}'
+                path = f'./degree/{_sequence}/{target[0]}/'
                 os.makedirs(path, exist_ok=True)
-                print('Time location：{} → {}'.format(files[i], files[i+1]))
-                degree_centrality(Graph).to_csv(os.path.join(path, 'degree_' + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i]))
-                                                                + '+' + re.sub('.paj', '.csv', os.path.basename(files[i+1]))))
+                # print('Time location：{} → {}'.format(files[i], files[i+1]))
+                if sequence:
+                    degree_centrality(Graph).to_csv(os.path.join(path, 'degree_' + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i]))
+                                                                    + '+' + re.sub('.paj', '.csv', os.path.basename(files[i+1]))))
+                else:
+                    degree_centrality(Graph).to_csv(os.path.join(path, 'degree_' + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i]))))
 
             if close:
-                path = f'./close/{_sequence}/{target[0]}'
+                path = f'./close/{_sequence}/{target[0]}/'
                 os.makedirs(path, exist_ok=True)
-                print('Time location：{} → {}'.format(files[i], files[i+1]))
-                close_centrality(Graph).to_csv(os.path.join(path, 'close_' + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i]))
-                                                                + '+' + re.sub('.paj', '.csv', os.path.basename(files[i+1]))))
+                # print('Time location：{} → {}'.format(files[i], files[i+1]))
+                if sequence:
+                    close_centrality(Graph).to_csv(os.path.join(path, 'close_' + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i]))
+                                                                    + '+' + re.sub('.paj', '.csv', os.path.basename(files[i+1]))))
+                else:
+                    close_centrality(Graph).to_csv(os.path.join(path, 'close_' + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i]))))
 
             if between:
-                path = f'./between/{_sequence}/{target[0]}'
+                path = f'./between/{_sequence}/{target[0]}/'
                 os.makedirs(path, exist_ok=True)
-                print('Time location：{} → {}'.format(files[i], files[i+1]))
-                between_centrality(Graph).to_csv(os.path.join(path, 'between_' + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i]))
-                                                                + '+' + re.sub('.paj', '.csv', os.path.basename(files[i+1]))))
+                # print('Time location：{} → {}'.format(files[i], files[i+1]))
+                if sequence:
+                    between_centrality(Graph).to_csv(os.path.join(path, 'between_' + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i]))
+                                                                    + '+' + re.sub('.paj', '.csv', os.path.basename(files[i+1]))))
+                else:
+                    between_centrality(Graph).to_csv(os.path.join(path, 'between_' + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i]))))
 
             if eigen:
-                path = f'./eigen/{_sequence}/{target[0]}'
+                path = f'./eigen/{_sequence}/{target[0]}/'
                 os.makedirs(path, exist_ok=True)
-                print('Time location：{} → {}'.format(files[i], files[i+1]))
-                eigen_centrality(Graph).to_csv(os.path.join(path, 'eigen_' + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i]))
-                                                                + '+' + re.sub('.paj', '.csv', os.path.basename(files[i+1]))))
+                # print('Time location：{} → {}'.format(files[i], files[i+1]))
+                if sequence:
+                    eigen_centrality(Graph).to_csv(os.path.join(path, 'eigen_' + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i]))
+                                                                    + '+' + re.sub('.paj', '.csv', os.path.basename(files[i+1]))))
+                else:
+                    eigen_centrality(Graph).to_csv(os.path.join(path, 'eigen_' + target[0] + '_' + re.sub('.paj', '', os.path.basename(files[i]))))
+
             if cluster:
-                print('Time location：{} → {}'.format(files[i], files[i+1]))
+                # if sequence:
+                #     print('Time location：{} → {}'.format(files[i], files[i+1]))
+                # else:
+                #     print('Time location：{}'.format(files[i]))
+
                 print_clustering_value(Graph)
 
     
@@ -191,9 +231,9 @@ def print_clustering_value(Graph: object):
 
 
 if __name__ == '__main__':
-    files = sorted(glob.glob('./**/*.paj'))
+    files = sorted(glob.glob('./data/**/*.paj'))
 
-    pajek_to_net(files, target=['dev'], figure_x=50, figure_y=50, anotation=True, degree=True, close=True, between=True, print_graph=False)
-    pajek_to_net(files, target=['bug'], figure_x=50, figure_y=50, anotation=True, degree=True, close=True, between=True, print_graph=False)
-    pajek_to_net(files, target=['dev'], figure_x=50, figure_y=50, anotation=True, degree=True, close=True, between=True, sequence=True, print_graph=False)
-    pajek_to_net(files, target=['bug'], figure_x=50, figure_y=50, anotation=True, degree=True, close=True, between=True, sequence=True, print_graph=False)
+    pajek_to_net(files, target=['dev'], figure_x=50, figure_y=50, anotation=True, between=True, print_graph=True)
+    pajek_to_net(files, target=['bug'], figure_x=50, figure_y=50, anotation=True, between=True, print_graph=True)
+    pajek_to_net(files, target=['dev'], figure_x=50, figure_y=50, anotation=True, between=True, sequence=True, print_graph=True)
+    pajek_to_net(files, target=['bug'], figure_x=50, figure_y=50, anotation=True, between=True, sequence=True, print_graph=True)
